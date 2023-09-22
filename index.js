@@ -1,104 +1,156 @@
-// *********Links********* \\
-// https://www.postman.com/downloads/
-// https://rickandmortyapi.com/documentation
-// https://www.weatherapi.com/docs/
+// fetch('https://jsonplaceholder.typicode.com/tasks')
+//       .then(response => {
+//         if (response.ok) {
+//             return console.log(ok)
+//         }
 
-// Приклад документації до API
-// https://rickandmortyapi.com/documentation/#rest
+//         throw new Error('Response is not ok')
+//       })
+//     //   .then(json => console.log(json))
+//     .catch((error) => console.log(error))
+
+// Створи фільмотеку з популярними фільмами, для цього використай
+// https://developer.themoviedb.org/reference/trending-movies
+
+// API_KEY = "345007f9ab440e5b86cef51be6397df1";
+
+// Щоб отримати постер фільму потрібно підставити url з відповіді від бекенду та url з документації
+// https://developer.themoviedb.org/docs/image-basics
+
+// Відмалюй картки з фільмами
+// Приклад картки  => https://prnt.sc/Hi_iLLg7Nd1F
+
+// Реалізуй пагінацію
+// 1 Кнопка "Load More"
+// 2 Infinity scroll (https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
+
+// *********************** Кнопка "Load More" ************************** \\
+// let page = 1;
+
+// const selectors = {
+//     container: document.querySelector('.js-movie-list'),
+//     loadMore: document.querySelector('.js-load-more'),
+// }
+
+// selectors.loadMore.addEventListener('click', onLoadMore);
+
+// serviceMovie()
+// .then(result => {
+//     const markup = createMarkup(result.results);
+//     selectors.container.insertAdjacentHTML('beforeend', markup);
+
+//     selectors.loadMore.classList.replace('load-more-hidden', 'load-more')
+// })
+
+
+// // makes request
+// function serviceMovie(page = 1) {
+//     const API_KEY = "345007f9ab440e5b86cef51be6397df1";
+//     const BASE_URL = 'https://api.themoviedb.org/3';
+//     const END_RESOURCE = '/trending/movie/week';
+
+//     return fetch(`${BASE_URL}${END_RESOURCE}?api_key=${API_KEY}&page=${page}`)
+//         .then(response => {
+//             if (!response.ok) {
+//                 throw new Error(response.statusText);
+//             }
+        
+//             return response.json();
+//         })
+//         .catch(error => console.log(error))
+// }
+
+
+// function createMarkup (movieArr) {
+//     return movieArr.map(({ poster_path, release_date, original_title, vote_average }) => `
+//     <li class="movie-card">
+//     <img src="https://image.tmdb.org/t/p/w500${poster_path}" alt="${original_title}">
+//     <div class="movie-info">
+//     <h2>${original_title}</h2>
+//     <p>Release date: ${release_date}</p>
+//     <p>Vote average: ${vote_average}</p>
+//     </div>
+//     </li>
+//     `)
+//     .join('');
+// }
+
+// function onLoadMore () {
+//     page += 1;
+
+//     serviceMovie(page)
+//     .then(result => {
+//     const markup = createMarkup(result.results);
+//     selectors.container.insertAdjacentHTML('beforeend', markup);
+// })
+// }
 
 
 
+// ********************************Infinity scroll ********************** \\
+
+let page = 1;
+
+const selectors = {
+    container: document.querySelector('.js-movie-list'),
+    jsGuard: document.querySelector('.js-guard'),
+}
+
+const observer = new IntersectionObserver(handlerObserver);
 
 
-// *********Fetch********* \\
+serviceMovie()
+.then(result => {
+    const markup = createMarkup(result.results);
+    selectors.container.insertAdjacentHTML('beforeend', markup);
+
+    observer.observe(selectors.jsGuard);
+})
+
+// makes request
+function serviceMovie(page = 1) {
+    const API_KEY = "345007f9ab440e5b86cef51be6397df1";
+    const BASE_URL = 'https://api.themoviedb.org/3';
+    const END_RESOURCE = '/trending/movie/week';
+
+    return fetch(`${BASE_URL}${END_RESOURCE}?api_key=${API_KEY}&page=${page}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText);
+            }
+        
+            return response.json();
+        })
+        .catch(error => console.log(error))
+}
 
 
+function createMarkup (movieArr) {
+    return movieArr.map(({ poster_path, release_date, original_title, vote_average }) => `
+    <li class="movie-card">
+    <img src="https://image.tmdb.org/t/p/w500${poster_path}" alt="${original_title}">
+    <div class="movie-info">
+    <h2>${original_title}</h2>
+    <p>Release date: ${release_date}</p>
+    <p>Vote average: ${vote_average}</p>
+    </div>
+    </li>
+    `)
+    .join('');
+}
 
+function handlerObserver (entries) {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            console.log('ELEMENT WAS INTERSECTED');
 
+            page += 1;
 
-
-// *********Обробка помилок та парсинг відповіді********* \\
-
-
-
-
-
-// ***************Практика*************** \\
-
-// Потрібно створити функціонал для отримання прогнозу погоди в місті.
-// Використай публічне API https://www.weatherapi.com/docs/
-// Використовуй ендпоінт Forecast для того, щоб отримати прогноз погоди на декілька днів.
-
-// Створи форму в яку користувач:
-// 1 вводить назву міста.
-// 2 обирає на яку кількість днів він хоче отримати прогноз погоди (3, 5 та 7 днів).
-// (Іноді параметр не працює в такому випадку можна зробити пошук на 1, 2 та 3 дні)
-// Приклад форми https://prnt.sc/kFmLOj6gBdv-
-
-// Після сабміту форми відмалюй картки з інформацією отриманою з бекенду.
-// Картка має містити відомості про:
-// 1 Зображення з погодою (icon)
-// 2 Текст з погодою (text)
-// 3 Дату (date)
-// 4 Середню температуру в Цельсія (avgtemp_c)
-// Приклад картки https://prnt.sc/h_p-A6Hty-i-
-
-// !!! ЗВЕРНИ УВАГУ ЩО API_KEY ПІСЛЯ РЕЄСТРАЦІЇ ВАЛІДНИЙ 21 ДЕНЬ !!!.
-
-const searchForm = document.querySelector(".js-search-form");
-const list = document.querySelector(".js-list");
-
-searchForm.addEventListener("submit", handlerSearch);
-
-function handlerSearch(evt) {
-  evt.preventDefault();
-
-  const { city, days } = evt.currentTarget.elements;
-
-  serviceWeather(city.value, days.value)
-    .then((data) => {
-      list.innerHTML = createMarkup(data.forecast.forecastday);
+            serviceMovie(page)
+                .then(result => {
+            const markup = createMarkup(result.results);
+            selectors.container.insertAdjacentHTML('beforeend', markup);
+        })
+        }
     })
-    .catch((err) => console.error(err))
-    .finally(() => searchForm.reset());
-}
-
-
-function serviceWeather(city = "", days = 1) {
-  const BASE_URL = "http://api.weatherapi.com/v1";
-  const API_KEY = "6410346f89264d6e919165208231505";
-
-  const params = new URLSearchParams({
-    key: API_KEY,
-    q: city,
-    days: days,
-    lang: "uk",
-  });
-
-  return fetch(`${BASE_URL}/forecast.json?${params}`).then((resp) => {
-    if (!resp.ok) {
-      throw new Error(resp.statusText);
-    }
-
-    return resp.json();
-  });
-}
-
-function createMarkup(arr) {
-  return arr
-    .map(
-      ({
-        date,
-        day: {
-          avgtemp_c,
-          condition: { text, icon },
-        },
-      }) => `<li class="weather-card">
-        <img src="${icon}" alt="${text}" class="weather-icon">
-        <h2 class="date">${date}</h2>
-        <h3 class="weather-text">${text}</h3>
-        <h3 class="temperature">${avgtemp_c} °C</h3>
-    </li>`
-    )
-    .join("");
 }
